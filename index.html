@@ -179,7 +179,7 @@
         </div>
       </div>
 
-      <!-- Players Configuration Panel (Updated like UI in Screenshot) -->
+      <!-- Players Configuration Panel -->
       <div class="glass-panel rounded-2xl p-4 sm:p-6 space-y-4">
         <div class="flex items-center justify-between border-b border-slate-700/50 pb-3">
           <span class="text-sm font-semibold text-slate-300">Ilość:</span>
@@ -280,13 +280,15 @@
               </button>
             </div>
 
-            <!-- Draw Tiles & Penalties -->
-            <div class="grid grid-cols-2 gap-2 mt-2">
-              <button type="button" onclick="addPenalty(-5)" class="p-2 rounded-lg bg-red-950/40 border border-red-800 text-red-300 hover:bg-red-900/50 text-xs font-bold">
-                Dobranie kamienia (-5 pkt)
+            <!-- Sequential Draw / Penalty Single Button -->
+            <div class="flex items-center gap-2 mt-2">
+              <button type="button" id="seqPenaltyBtn" onclick="handlePenaltyStep()" class="flex-1 py-2.5 px-3 rounded-xl bg-red-950/40 border border-red-800/80 text-red-300 hover:bg-red-900/50 text-xs font-black tracking-wide transition flex items-center justify-center gap-2">
+                <i class="fa-solid fa-plus-minus text-red-400"></i>
+                <span id="seqPenaltyLabel">Dobranie kamienia -5pkt</span>
               </button>
-              <button type="button" onclick="applyMaxDrawPenalty()" class="p-2 rounded-lg bg-red-900/60 border border-red-600 text-red-200 hover:bg-red-800 text-xs font-bold">
-                Brak możliwości (-25 pkt)
+
+              <button type="button" id="resetPenaltyBtn" onclick="resetPenaltyStep()" title="Resetuj kary" class="p-2.5 rounded-xl bg-slate-800 border border-slate-700 text-slate-400 hover:text-slate-200 text-xs font-bold hidden">
+                <i class="fa-solid fa-rotate-left"></i>
               </button>
             </div>
 
@@ -369,16 +371,9 @@
   </footer>
 
   <script>
-    // Expanded palette according to UI screenshot
     const COLOR_PALETTE = [
-      '#ef4444', // Red / Coral
-      '#1e3a8a', // Dark Blue
-      '#c2410c', // Orange/Brown
-      '#475569', // Slate/Grey
-      '#10b981', // Emerald/Green
-      '#8b5cf6', // Violet
-      '#a16207', // Olive/Gold
-      '#be185d'  // Crimson/Pink
+      '#ef4444', '#1e3a8a', '#c2410c', '#475569',
+      '#10b981', '#8b5cf6', '#a16207', '#be185d'
     ];
 
     const ROTATIONS = [0, 90, 180, 270];
@@ -394,7 +389,8 @@
       remainingTime: 60,
       timerInterval: null,
       activeBonuses: {},
-      penaltyScore: 0
+      penaltyScore: 0,
+      penaltyStepState: 0 // 0: Start (-5), 1: (-10), 2: (-15), 3: (-25)
     };
 
     let synth = null;
@@ -507,7 +503,6 @@
 
         card.innerHTML = `
           <div class="flex items-center gap-2">
-            <!-- Order Arrows & Number -->
             <div class="flex items-center gap-1.5 bg-slate-800/80 px-2 py-1 rounded-lg border border-slate-700/60">
               <span class="font-black text-sm text-slate-200">${idx + 1}</span>
               <div class="flex flex-col text-[10px] leading-tight text-slate-400">
@@ -520,16 +515,13 @@
               </div>
             </div>
 
-            <!-- Player Name Input -->
             <input type="text" value="${p.name}" oninput="gameState.players[${idx}].name=this.value" placeholder="Gracz ${idx + 1}" class="input-box flex-1 px-3 py-1.5 text-sm font-semibold rounded-xl border focus:outline-none focus:border-teal-400">
 
-            <!-- Delete Player Button -->
             <button type="button" onclick="removePlayer(${idx})" class="${gameState.players.length <= 2 ? 'opacity-20 cursor-default text-slate-500' : 'text-slate-500 hover:text-red-400'} p-1.5 text-sm transition" ${gameState.players.length <= 2 ? 'disabled' : ''}>
               <i class="fa-solid fa-trash-can"></i>
             </button>
           </div>
 
-          <!-- Color Swatches & Rotation Button Row -->
           <div class="flex items-center justify-between gap-2 pt-1">
             <div class="flex items-center gap-1.5 flex-wrap flex-1">
               ${COLOR_PALETTE.map(hex => `
@@ -537,7 +529,6 @@
               `).join('')}
             </div>
 
-            <!-- Rotation Control Button -->
             <button type="button" onclick="cycleRotation(${idx})" class="px-2.5 py-1 rounded-xl bg-slate-800/90 border border-slate-700/80 text-amber-400 hover:text-amber-300 font-bold text-xs flex items-center gap-1.5 shrink-0">
               <i class="fa-solid fa-rotate-right"></i>
               <span>${p.rotation}°</span>
@@ -547,7 +538,6 @@
         container.appendChild(card);
       });
 
-      // Update Top Count Pill Buttons
       document.querySelectorAll('.count-btn').forEach(btn => {
         const c = parseInt(btn.dataset.count);
         btn.className = c === gameState.players.length 
@@ -555,7 +545,6 @@
           : 'count-btn px-4 py-1 rounded-lg text-sm font-bold text-slate-400 hover:text-white hover:bg-slate-800/60';
       });
 
-      // Toggle Add Player Button Visibility
       const addBtn = document.getElementById('addPlayerBtn');
       if (addBtn) {
         addBtn.style.display = gameState.players.length >= 4 ? 'none' : 'flex';
@@ -651,25 +640,65 @@
       }
     }
 
-    function addPenalty(val) {
-      gameState.penaltyScore += val;
+    /* SEQUENTIAL PENALTY BUTTON LOGIC */
+    function handlePenaltyStep() {
       playSound('warning');
-      updatePenaltyDisplay();
+
+      if (gameState.penaltyStepState === 0) {
+        // First click -> -5 pkt
+        gameState.penaltyScore = -5;
+        gameState.penaltyStepState = 1;
+      } else if (gameState.penaltyStepState === 1) {
+        // Second click -> -10 pkt
+        gameState.penaltyScore = -10;
+        gameState.penaltyStepState = 2;
+      } else if (gameState.penaltyStepState === 2) {
+        // Third click -> -15 pkt
+        gameState.penaltyScore = -15;
+        gameState.penaltyStepState = 3;
+      } else if (gameState.penaltyStepState === 3) {
+        // Fourth click -> -25 pkt & end turn
+        gameState.penaltyScore = -25;
+        updatePenaltyUI();
+        submitTurnScore();
+        return;
+      }
+
+      updatePenaltyUI();
     }
 
-    function applyMaxDrawPenalty() {
-      // 3 tiles drawn and unable to play: -5-5-5-10 = -25 pts total
-      gameState.penaltyScore = -25;
-      playSound('warning');
-      updatePenaltyDisplay();
+    function resetPenaltyStep() {
+      gameState.penaltyScore = 0;
+      gameState.penaltyStepState = 0;
+      updatePenaltyUI();
     }
 
-    function updatePenaltyDisplay() {
+    function updatePenaltyUI() {
+      const label = document.getElementById('seqPenaltyLabel');
+      const btn = document.getElementById('seqPenaltyBtn');
+      const resetBtn = document.getElementById('resetPenaltyBtn');
       const disp = document.getElementById('penaltyBadgeDisplay');
-      if (gameState.penaltyScore < 0) {
-        disp.innerText = `Suma kar w tej turze: ${gameState.penaltyScore} pkt`;
-      } else {
+
+      if (gameState.penaltyStepState === 0) {
+        label.innerText = 'Dobranie kamienia -5pkt';
+        btn.className = 'flex-1 py-2.5 px-3 rounded-xl bg-red-950/40 border border-red-800/80 text-red-300 hover:bg-red-900/50 text-xs font-black tracking-wide transition flex items-center justify-center gap-2';
+        resetBtn.classList.add('hidden');
         disp.innerText = '';
+      } else if (gameState.penaltyStepState === 1) {
+        label.innerText = 'Dobranie kamienia -10pkt';
+        btn.className = 'flex-1 py-2.5 px-3 rounded-xl bg-red-900/60 border border-red-700 text-red-200 hover:bg-red-800/70 text-xs font-black tracking-wide transition flex items-center justify-center gap-2';
+        resetBtn.classList.remove('hidden');
+        disp.innerText = 'Kara: -5 pkt za 1. kamień';
+      } else if (gameState.penaltyStepState === 2) {
+        label.innerText = 'Dobranie kamienia -15pkt';
+        btn.className = 'flex-1 py-2.5 px-3 rounded-xl bg-red-800 border border-red-600 text-white hover:bg-red-700 text-xs font-black tracking-wide transition flex items-center justify-center gap-2';
+        resetBtn.classList.remove('hidden');
+        disp.innerText = 'Kara: -10 pkt za 2 kamienie';
+      } else if (gameState.penaltyStepState === 3) {
+        label.innerText = 'Brak możliwości -25pkt (Przekaż turę)';
+        btn.className = 'flex-1 py-2.5 px-3 rounded-xl bg-amber-600 border border-amber-400 text-slate-950 hover:bg-amber-500 text-xs font-black tracking-wide transition flex items-center justify-center gap-2 shadow-lg';
+        resetBtn.classList.remove('hidden');
+        disp.innerText = 'Kara: -15 pkt za 3 kamienie. Kliknij ponownie, aby oddać turę (-25 pkt)';
       }
     }
 
@@ -679,13 +708,12 @@
       document.getElementById('corner3').value = '';
       document.getElementById('checkFinishBonus').checked = false;
       gameState.activeBonuses = {};
-      gameState.penaltyScore = 0;
 
       document.querySelectorAll('.bonus-btn').forEach(b => {
         b.className = 'bonus-btn p-2 rounded-lg bg-slate-800 border border-slate-700 text-slate-300 hover:border-amber-400';
       });
 
-      updatePenaltyDisplay();
+      resetPenaltyStep();
     }
 
     function submitTurnScore() {
