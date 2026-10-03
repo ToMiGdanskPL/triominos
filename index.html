@@ -126,11 +126,15 @@
         </div>
         <div>
           <h1 class="header-title font-black text-lg leading-tight tracking-wide text-white">Triominos Masters</h1>
-          <p class="text-[10px] text-teal-400 font-bold uppercase tracking-wider">Licznik & Wyniki</p>
         </div>
       </div>
 
       <div class="flex items-center gap-2">
+        <!-- Przycisk Instrukcji (i) -->
+        <button id="infoToggleBtn" onclick="toggleRulesModal()" class="theme-btn-bg px-3 py-1.5 rounded-xl bg-slate-800 hover:bg-slate-700 text-slate-300 hover:text-white transition flex items-center justify-center gap-1.5 text-sm border border-slate-700 h-[38px]" title="Instrukcja gry">
+          <i class="fa-solid fa-info-circle text-teal-400 text-base"></i>
+        </button>
+
         <button id="soundToggleBtn" onclick="toggleSound()" class="theme-btn-bg px-3 py-1.5 rounded-xl bg-slate-800 hover:bg-slate-700 text-slate-300 hover:text-white transition flex items-center gap-2 text-sm border border-slate-700 h-[38px]">
           <i id="soundIcon" class="fa-solid fa-volume-xmark text-amber-400"></i>
           <span class="hidden sm:inline text-xs font-semibold">Dźwięk</span>
@@ -329,6 +333,94 @@
 
   </main>
 
+  <!-- RULES MODAL (INSTRUKCJA GRY) -->
+  <div id="rulesModal" class="fixed inset-0 z-50 flex items-center justify-center bg-black/80 backdrop-blur-md hidden p-4">
+    <div class="glass-panel bg-slate-900 border border-slate-700 rounded-3xl max-w-2xl w-full p-6 space-y-4 max-h-[85vh] flex flex-col">
+      <div class="flex items-center justify-between border-b border-slate-700 pb-3 shrink-0">
+        <div class="flex items-center gap-2">
+          <i class="fa-solid fa-book-open text-teal-400 text-xl"></i>
+          <h3 class="text-xl font-black text-white">Instrukcja Gry Triominos</h3>
+        </div>
+        <button onclick="toggleRulesModal()" class="text-slate-400 hover:text-white text-lg p-1">
+          <i class="fa-solid fa-xmark"></i>
+        </button>
+      </div>
+
+      <div class="overflow-y-auto space-y-4 pr-2 text-xs sm:text-sm text-slate-300 leading-relaxed shrink">
+        
+        <section>
+          <h4 class="font-bold text-teal-400 text-base mb-1">1. Cel gry</h4>
+          <p>Zdobycie jak największej liczby punktów poprzez układanie trójkątnych kamieni (Triomino) tak, aby liczby na stykających się bokach były identyczne.</p>
+        </section>
+
+        <section>
+          <h4 class="font-bold text-teal-400 text-base mb-1">2. Przygotowanie</h4>
+          <ul class="list-disc pl-5 space-y-1">
+            <li>Wszystkie kamienie układa się liczbami do dołu i miesza.</li>
+            <li>Każdy gracz losuje odpowiednią liczbę kamieni na swoją podstawkę:
+              <ul class="list-circle pl-5 mt-1 text-slate-400">
+                <li>2 graczy: po 9 kamieni</li>
+                <li>3-4 graczy: po 7 kamieni</li>
+              </ul>
+            </li>
+          </ul>
+        </section>
+
+        <section>
+          <h4 class="font-bold text-teal-400 text-base mb-1">3. Rozpoczęcie gry</h4>
+          <p>Grę rozpoczyna gracz posiadający potrójny kamień o najwyższej wartości (np. 5-5-5, potem 4-4-4 itd.). Otrzymuje za niego sumę punktów + bonus 10 pkt. Jeśli nikt nie ma potrójnego kamienia, rozpoczyna gracz z kamieniem o najwyższej sumie oczek.</p>
+        </section>
+
+        <section>
+          <h4 class="font-bold text-teal-400 text-base mb-1">4. Przebieg tury</h4>
+          <p>W swojej turze gracz dokłada 1 kamień pasujący do układu na stole (dwa rogi musza się zgadzać). Zdobywa punkty równe sumie cyfr na dołożonym kamieniu + ew. bonusy.</p>
+          <p class="mt-1 font-semibold text-amber-300">Jeśli gracz nie ma pasującego kamienia:</p>
+          <ul class="list-disc pl-5 space-y-1">
+            <li>Dobiera kamień z zakrytego stosu (-5 pkt).</li>
+            <li>Jeśli nadal nie pasuje, dobiera drugi (-5 pkt, łącznie -10 pkt).</li>
+            <li>Jeśli nadal nie pasuje, dobiera trzeci (-5 pkt, łącznie -15 pkt).</li>
+            <li>Jeśli po dobraniu 3 kamieni nadal nie może wykonać ruchu, oddaje turę i otrzymuje dodatkową karę -10 pkt (łącznie **-25 pkt** w turze).</li>
+          </ul>
+        </section>
+
+        <section>
+          <h4 class="font-bold text-teal-400 text-base mb-1">5. Premie specjalne (Bonusy)</h4>
+          <div class="grid grid-cols-1 sm:grid-cols-2 gap-2 mt-2">
+            <div class="bg-slate-800/80 p-2.5 rounded-xl border border-slate-700">
+              <span class="font-bold text-amber-400">Most (+40 pkt)</span>
+              <p class="text-xs text-slate-400 mt-0.5">Zamknięcie wolnej przestrzeni poprzez dopasowanie jednego rogu do dwóch innych kamieni.</p>
+            </div>
+            <div class="bg-slate-800/80 p-2.5 rounded-xl border border-slate-700">
+              <span class="font-bold text-amber-400">Heksagon (+50 pkt)</span>
+              <p class="text-xs text-slate-400 mt-0.5">Ułożenie 6 kamieni tworzących pełne koło / sześciobok.</p>
+            </div>
+            <div class="bg-slate-800/80 p-2.5 rounded-xl border border-slate-700">
+              <span class="font-bold text-amber-400">Podwójny Heksagon (+60 pkt)</span>
+              <p class="text-xs text-slate-400 mt-0.5">Jednoczesne dokończenie dwóch heksagonów jednym ruchem.</p>
+            </div>
+            <div class="bg-slate-800/80 p-2.5 rounded-xl border border-slate-700">
+              <span class="font-bold text-amber-400">Potrójny Heksagon (+70 pkt)</span>
+              <p class="text-xs text-slate-400 mt-0.5">Jednoczesne dokończenie trzech heksagonów jednym ruchem.</p>
+            </div>
+          </div>
+        </section>
+
+        <section>
+          <h4 class="font-bold text-teal-400 text-base mb-1">6. Zakończenie rundy / gry</h4>
+          <p>Runda kończy się, gdy jeden z graczy wyłoży wszystkie swoje kamienie (**bonus +25 pkt** za zakończenie) LUB żaden z graczy nie może już dołożyć kamienia.</p>
+          <p class="mt-1">Zwycięzca rundy otrzymuje również sumę punktów z kamieni pozostałych na podstawkach przeciwników!</p>
+        </section>
+
+      </div>
+
+      <div class="pt-3 border-t border-slate-700 flex justify-end shrink-0">
+        <button onclick="toggleRulesModal()" class="px-6 py-2.5 rounded-xl bg-teal-500 hover:bg-teal-400 text-slate-950 font-bold text-xs uppercase tracking-wider">
+          Rozumiem
+        </button>
+      </div>
+    </div>
+  </div>
+
   <!-- SUMMARY MODAL -->
   <div id="summaryModal" class="fixed inset-0 z-50 flex items-center justify-center bg-black/80 backdrop-blur-md hidden p-4">
     <div class="glass-panel bg-slate-900 border border-slate-700 rounded-3xl max-w-lg w-full p-6 space-y-5">
@@ -368,8 +460,9 @@
     </div>
   </div>
 
+  <!-- FOOTER -->
   <footer class="footer-bar w-full text-center py-3 text-xs border-t transition-colors duration-300">
-    Triominos Masters · Stworzone z Gemini AI
+    Created by ToMi with AI • wersja 1.0.1
   </footer>
 
   <script>
@@ -420,6 +513,11 @@
           synth.triggerAttackRelease("C6", "4n", now + 0.3);
         }
       } catch (e) {}
+    }
+
+    function toggleRulesModal() {
+      const modal = document.getElementById('rulesModal');
+      modal.classList.toggle('hidden');
     }
 
     function toggleSound() {
