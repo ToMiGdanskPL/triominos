@@ -179,27 +179,27 @@
         </div>
       </div>
 
-      <!-- Players Configuration Panel -->
+      <!-- Players Configuration Panel (Updated like UI in Screenshot) -->
       <div class="glass-panel rounded-2xl p-4 sm:p-6 space-y-4">
-        <div class="flex flex-wrap items-center justify-between gap-3 border-b border-slate-700/50 pb-4">
-          <div>
-            <h3 class="text-sm font-bold uppercase tracking-wider text-teal-400 flex items-center gap-2">
-              <i class="fa-solid fa-users"></i> Uczestnicy Gry (2-4)
-            </h3>
-            <p class="text-xs text-slate-400 mt-0.5">Wprowadź imiona graczy i wybierz ich kolory.</p>
-          </div>
-
-          <div class="flex items-center bg-slate-900/60 p-1 rounded-xl border border-slate-700">
-            <span class="text-xs text-slate-300 font-semibold px-2">Liczba:</span>
-            <button onclick="setPlayerCount(2)" class="count-btn px-3 py-1 rounded-lg text-xs font-bold" data-count="2">2</button>
-            <button onclick="setPlayerCount(3)" class="count-btn px-3 py-1 rounded-lg text-xs font-bold" data-count="3">3</button>
-            <button onclick="setPlayerCount(4)" class="count-btn px-3 py-1 rounded-lg text-xs font-bold" data-count="4">4</button>
+        <div class="flex items-center justify-between border-b border-slate-700/50 pb-3">
+          <span class="text-sm font-semibold text-slate-300">Ilość:</span>
+          <div class="flex items-center bg-slate-900/80 p-1 rounded-xl border border-slate-700/80 gap-1">
+            <button onclick="setPlayerCount(2)" class="count-btn px-4 py-1 rounded-lg text-sm font-bold" data-count="2">2</button>
+            <button onclick="setPlayerCount(3)" class="count-btn px-4 py-1 rounded-lg text-sm font-bold" data-count="3">3</button>
+            <button onclick="setPlayerCount(4)" class="count-btn px-4 py-1 rounded-lg text-sm font-bold" data-count="4">4</button>
           </div>
         </div>
 
+        <!-- Dynamic Players List -->
         <div id="playerSetupList" class="space-y-3">
-          <!-- Dynamic player list -->
+          <!-- Player Cards Rendered Here -->
         </div>
+
+        <!-- Add Player Button -->
+        <button id="addPlayerBtn" onclick="addPlayer()" class="w-full py-3 rounded-xl border-2 border-dashed border-slate-700/80 hover:border-slate-500 bg-slate-800/20 hover:bg-slate-800/40 text-slate-400 hover:text-slate-200 font-semibold text-sm flex items-center justify-center gap-2 transition">
+          <i class="fa-solid fa-plus text-xs"></i>
+          <span>Dodaj kolejnego gracza</span>
+        </button>
       </div>
 
       <button onclick="startGame()" class="w-full sm:w-auto px-10 py-4 rounded-2xl bg-gradient-to-r from-teal-500 via-cyan-500 to-amber-500 hover:from-teal-400 hover:to-amber-400 text-slate-950 font-black text-lg tracking-wider shadow-xl shadow-teal-950/20 transform active:scale-95 transition flex items-center justify-center gap-3 mx-auto border border-amber-300/40">
@@ -369,12 +369,19 @@
   </footer>
 
   <script>
-    const PALETTE = [
-      { name: 'Turkusowy', hex: '#0d9488' },
-      { name: 'Bursztynowy', hex: '#f59e0b' },
-      { name: 'Niebieski', hex: '#3b82f6' },
-      { name: 'Purpurowy', hex: '#a855f7' }
+    // Expanded palette according to UI screenshot
+    const COLOR_PALETTE = [
+      '#ef4444', // Red / Coral
+      '#1e3a8a', // Dark Blue
+      '#c2410c', // Orange/Brown
+      '#475569', // Slate/Grey
+      '#10b981', // Emerald/Green
+      '#8b5cf6', // Violet
+      '#a16207', // Olive/Gold
+      '#be185d'  // Crimson/Pink
     ];
+
+    const ROTATIONS = [0, 90, 180, 270];
 
     let gameState = {
       turnDuration: 60,
@@ -438,18 +445,17 @@
     }
 
     function setPlayerCount(count) {
-      // Limit to 2..4 players
       count = Math.min(Math.max(count, 2), 4);
       const current = gameState.players.length;
-      const angles = [0, 180, 90, 270];
+      const defaultRotations = [0, 180, 90, 270];
 
       if (count > current) {
         for (let i = current; i < count; i++) {
           gameState.players.push({
             id: Date.now() + i,
             name: `Gracz ${i + 1}`,
-            colorHex: PALETTE[i % PALETTE.length].hex,
-            rotation: angles[i % angles.length],
+            colorHex: COLOR_PALETTE[i % COLOR_PALETTE.length],
+            rotation: defaultRotations[i % defaultRotations.length],
             score: 0,
             turnsPlayed: 0
           });
@@ -460,33 +466,100 @@
       renderSetupPlayerList();
     }
 
+    function addPlayer() {
+      if (gameState.players.length < 4) {
+        setPlayerCount(gameState.players.length + 1);
+      }
+    }
+
+    function removePlayer(idx) {
+      if (gameState.players.length > 2) {
+        gameState.players.splice(idx, 1);
+        renderSetupPlayerList();
+      }
+    }
+
+    function movePlayer(idx, dir) {
+      const newIdx = idx + dir;
+      if (newIdx >= 0 && newIdx < gameState.players.length) {
+        const temp = gameState.players[idx];
+        gameState.players[idx] = gameState.players[newIdx];
+        gameState.players[newIdx] = temp;
+        renderSetupPlayerList();
+      }
+    }
+
+    function cycleRotation(idx) {
+      const p = gameState.players[idx];
+      const curAngleIdx = ROTATIONS.indexOf(p.rotation);
+      p.rotation = ROTATIONS[(curAngleIdx + 1) % ROTATIONS.length];
+      renderSetupPlayerList();
+    }
+
     function renderSetupPlayerList() {
       const container = document.getElementById('playerSetupList');
       if (!container) return;
       container.innerHTML = '';
 
       gameState.players.forEach((p, idx) => {
-        const row = document.createElement('div');
-        row.className = 'flex items-center gap-2 bg-slate-800/30 p-2.5 rounded-xl border border-slate-700/50';
+        const card = document.createElement('div');
+        card.className = 'bg-slate-900/60 p-3.5 rounded-2xl border border-slate-800 space-y-3';
 
-        row.innerHTML = `
-          <span class="w-6 h-6 rounded-lg bg-slate-800 text-slate-300 flex items-center justify-center font-bold text-xs flex-shrink-0">
-            ${idx + 1}
-          </span>
-          <input type="text" value="${p.name}" oninput="gameState.players[${idx}].name=this.value" placeholder="Gracz ${idx + 1}" class="input-box flex-1 border rounded-lg px-3 py-1.5 text-sm font-semibold focus:outline-none">
-          <div class="flex items-center gap-1">
-            ${PALETTE.map(c => `
-              <button type="button" onclick="gameState.players[${idx}].colorHex='${c.hex}'; renderSetupPlayerList();" class="w-5 h-5 rounded-full ${p.colorHex === c.hex ? 'ring-2 ring-white scale-110' : 'opacity-40'}" style="background-color: ${c.hex}"></button>
-            `).join('')}
+        card.innerHTML = `
+          <div class="flex items-center gap-2">
+            <!-- Order Arrows & Number -->
+            <div class="flex items-center gap-1.5 bg-slate-800/80 px-2 py-1 rounded-lg border border-slate-700/60">
+              <span class="font-black text-sm text-slate-200">${idx + 1}</span>
+              <div class="flex flex-col text-[10px] leading-tight text-slate-400">
+                <button type="button" onclick="movePlayer(${idx}, -1)" class="${idx === 0 ? 'opacity-20 cursor-default' : 'hover:text-white'}" ${idx === 0 ? 'disabled' : ''}>
+                  <i class="fa-solid fa-chevron-up"></i>
+                </button>
+                <button type="button" onclick="movePlayer(${idx}, 1)" class="${idx === gameState.players.length - 1 ? 'opacity-20 cursor-default' : 'hover:text-white'}" ${idx === gameState.players.length - 1 ? 'disabled' : ''}>
+                  <i class="fa-solid fa-chevron-down"></i>
+                </button>
+              </div>
+            </div>
+
+            <!-- Player Name Input -->
+            <input type="text" value="${p.name}" oninput="gameState.players[${idx}].name=this.value" placeholder="Gracz ${idx + 1}" class="input-box flex-1 px-3 py-1.5 text-sm font-semibold rounded-xl border focus:outline-none focus:border-teal-400">
+
+            <!-- Delete Player Button -->
+            <button type="button" onclick="removePlayer(${idx})" class="${gameState.players.length <= 2 ? 'opacity-20 cursor-default text-slate-500' : 'text-slate-500 hover:text-red-400'} p-1.5 text-sm transition" ${gameState.players.length <= 2 ? 'disabled' : ''}>
+              <i class="fa-solid fa-trash-can"></i>
+            </button>
+          </div>
+
+          <!-- Color Swatches & Rotation Button Row -->
+          <div class="flex items-center justify-between gap-2 pt-1">
+            <div class="flex items-center gap-1.5 flex-wrap flex-1">
+              ${COLOR_PALETTE.map(hex => `
+                <button type="button" onclick="gameState.players[${idx}].colorHex='${hex}'; renderSetupPlayerList();" class="w-6 h-6 rounded-full transition-all ${p.colorHex === hex ? 'ring-2 ring-amber-400 ring-offset-2 ring-offset-slate-900 scale-110' : 'opacity-70 hover:opacity-100'}" style="background-color: ${hex}"></button>
+              `).join('')}
+            </div>
+
+            <!-- Rotation Control Button -->
+            <button type="button" onclick="cycleRotation(${idx})" class="px-2.5 py-1 rounded-xl bg-slate-800/90 border border-slate-700/80 text-amber-400 hover:text-amber-300 font-bold text-xs flex items-center gap-1.5 shrink-0">
+              <i class="fa-solid fa-rotate-right"></i>
+              <span>${p.rotation}°</span>
+            </button>
           </div>
         `;
-        container.appendChild(row);
+        container.appendChild(card);
       });
 
+      // Update Top Count Pill Buttons
       document.querySelectorAll('.count-btn').forEach(btn => {
         const c = parseInt(btn.dataset.count);
-        btn.className = c === gameState.players.length ? 'count-btn px-3 py-1 rounded-lg text-xs font-black bg-teal-500 text-slate-950' : 'count-btn px-3 py-1 rounded-lg text-xs font-bold text-slate-300 hover:bg-slate-800';
+        btn.className = c === gameState.players.length 
+          ? 'count-btn px-4 py-1 rounded-lg text-sm font-black bg-amber-500 text-slate-950' 
+          : 'count-btn px-4 py-1 rounded-lg text-sm font-bold text-slate-400 hover:text-white hover:bg-slate-800/60';
       });
+
+      // Toggle Add Player Button Visibility
+      const addBtn = document.getElementById('addPlayerBtn');
+      if (addBtn) {
+        addBtn.style.display = gameState.players.length >= 4 ? 'none' : 'flex';
+      }
     }
 
     function selectPresetTime(sec) {
