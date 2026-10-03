@@ -149,7 +149,7 @@
     <section id="setupView" class="w-full space-y-6 animate-fade-in">
       <div class="text-center space-y-2">
         <span class="px-3 py-1 rounded-full text-xs font-bold uppercase tracking-wider bg-teal-500/10 text-teal-400 border border-teal-500/30">
-          Ustawienia Stolu i Zasad
+          Ustawienia Stołu i Zasad
         </span>
       </div>
 
@@ -184,18 +184,16 @@
         <div class="flex flex-wrap items-center justify-between gap-3 border-b border-slate-700/50 pb-4">
           <div>
             <h3 class="text-sm font-bold uppercase tracking-wider text-teal-400 flex items-center gap-2">
-              <i class="fa-solid fa-users"></i> Uczestnicy Gry (2-6)
+              <i class="fa-solid fa-users"></i> Uczestnicy Gry (2-4)
             </h3>
             <p class="text-xs text-slate-400 mt-0.5">Wprowadź imiona graczy i wybierz ich kolory.</p>
           </div>
 
           <div class="flex items-center bg-slate-900/60 p-1 rounded-xl border border-slate-700">
             <span class="text-xs text-slate-300 font-semibold px-2">Liczba:</span>
-            <button onclick="setPlayerCount(2)" class="count-btn px-2.5 py-1 rounded-lg text-xs font-bold" data-count="2">2</button>
-            <button onclick="setPlayerCount(3)" class="count-btn px-2.5 py-1 rounded-lg text-xs font-bold" data-count="3">3</button>
-            <button onclick="setPlayerCount(4)" class="count-btn px-2.5 py-1 rounded-lg text-xs font-bold" data-count="4">4</button>
-            <button onclick="setPlayerCount(5)" class="count-btn px-2.5 py-1 rounded-lg text-xs font-bold" data-count="5">5</button>
-            <button onclick="setPlayerCount(6)" class="count-btn px-2.5 py-1 rounded-lg text-xs font-bold" data-count="6">6</button>
+            <button onclick="setPlayerCount(2)" class="count-btn px-3 py-1 rounded-lg text-xs font-bold" data-count="2">2</button>
+            <button onclick="setPlayerCount(3)" class="count-btn px-3 py-1 rounded-lg text-xs font-bold" data-count="3">3</button>
+            <button onclick="setPlayerCount(4)" class="count-btn px-3 py-1 rounded-lg text-xs font-bold" data-count="4">4</button>
           </div>
         </div>
 
@@ -268,31 +266,39 @@
               2. Premie specjalne i Kary
             </label>
             <div class="grid grid-cols-2 sm:grid-cols-4 gap-1.5 text-xs font-bold">
-              <button type="button" onclick="toggleBonus('start', 10)" id="bonusStart" class="bonus-btn p-2 rounded-lg bg-slate-800 border border-slate-700 text-slate-300 hover:border-amber-400">
-                Start (+10)
-              </button>
               <button type="button" onclick="toggleBonus('bridge', 40)" id="bonusBridge" class="bonus-btn p-2 rounded-lg bg-slate-800 border border-slate-700 text-slate-300 hover:border-amber-400">
                 Most (+40)
               </button>
-              <button type="button" onclick="toggleBonus('conn1', 40)" id="bonusConn1" class="bonus-btn p-2 rounded-lg bg-slate-800 border border-slate-700 text-slate-300 hover:border-amber-400">
-                Połączenie 1 (+40)
+              <button type="button" onclick="toggleBonus('hexagon', 50)" id="bonusHexagon" class="bonus-btn p-2 rounded-lg bg-slate-800 border border-slate-700 text-slate-300 hover:border-amber-400">
+                Heksagon (+50)
               </button>
-              <button type="button" onclick="toggleBonus('conn2', 50)" id="bonusConn2" class="bonus-btn p-2 rounded-lg bg-slate-800 border border-slate-700 text-slate-300 hover:border-amber-400">
-                Połączenie 2 (+50)
+              <button type="button" onclick="toggleBonus('doubleHex', 60)" id="bonusDoubleHex" class="bonus-btn p-2 rounded-lg bg-slate-800 border border-slate-700 text-slate-300 hover:border-amber-400">
+                Podwójny Heksagon (+60)
               </button>
-              <button type="button" onclick="toggleBonus('conn3', 60)" id="bonusConn3" class="bonus-btn p-2 rounded-lg bg-slate-800 border border-slate-700 text-slate-300 hover:border-amber-400">
-                Połączenie 3 (+60)
-              </button>
-              <button type="button" onclick="toggleBonus('finish', 25)" id="bonusFinish" class="bonus-btn p-2 rounded-lg bg-slate-800 border border-slate-700 text-slate-300 hover:border-amber-400">
-                Koniec Gry (+25)
-              </button>
-              <button type="button" onclick="addPenalty(-10)" class="p-2 rounded-lg bg-red-950/40 border border-red-800 text-red-300 hover:bg-red-900/50">
-                Dobranie (-10)
-              </button>
-              <button type="button" onclick="clearScoreForm()" class="p-2 rounded-lg bg-slate-800 border border-slate-700 text-slate-400 hover:text-white">
-                Wyczyść
+              <button type="button" onclick="toggleBonus('tripleHex', 70)" id="bonusTripleHex" class="bonus-btn p-2 rounded-lg bg-slate-800 border border-slate-700 text-slate-300 hover:border-amber-400">
+                Potrójny Heksagon (+70)
               </button>
             </div>
+
+            <!-- Draw Tiles & Penalties -->
+            <div class="grid grid-cols-2 gap-2 mt-2">
+              <button type="button" onclick="addPenalty(-5)" class="p-2 rounded-lg bg-red-950/40 border border-red-800 text-red-300 hover:bg-red-900/50 text-xs font-bold">
+                Dobranie kamienia (-5 pkt)
+              </button>
+              <button type="button" onclick="applyMaxDrawPenalty()" class="p-2 rounded-lg bg-red-900/60 border border-red-600 text-red-200 hover:bg-red-800 text-xs font-bold">
+                Brak możliwości (-25 pkt)
+              </button>
+            </div>
+
+            <div id="penaltyBadgeDisplay" class="text-xs text-red-400 font-bold mt-1 min-h-[18px]"></div>
+          </div>
+
+          <!-- End Game Bonus Checkbox -->
+          <div class="bg-amber-500/10 border border-amber-500/30 p-2.5 rounded-xl text-left">
+            <label class="flex items-center gap-2 text-xs font-bold text-amber-300 cursor-pointer">
+              <input type="checkbox" id="checkFinishBonus" class="w-4 h-4 rounded accent-amber-500">
+              <span>Ostatnie Triomino (Bonus +25 pkt)</span>
+            </label>
           </div>
 
           <!-- Submit Score & Turn Button -->
@@ -330,7 +336,20 @@
         <p class="text-xs text-slate-400">Podsumowanie i klasyfikacja końcowa</p>
       </div>
 
-      <div id="summaryContentList" class="space-y-2.5 max-h-[50vh] overflow-y-auto">
+      <!-- Add remaining tiles bonus calculation -->
+      <div class="bg-slate-800/60 p-3 rounded-2xl border border-slate-700 space-y-2 text-left">
+        <label class="block text-xs font-bold text-amber-400">
+          Suma kamieni na podstawkach przeciwników (dla zwycięzcy):
+        </label>
+        <div class="flex gap-2">
+          <input type="number" id="opponentTilesSum" placeholder="np. 45" class="input-box flex-1 px-3 py-1.5 text-sm font-bold rounded-xl border focus:outline-none">
+          <button onclick="addOpponentTilesToWinner()" class="px-4 py-1.5 bg-amber-500 hover:bg-amber-400 text-slate-950 font-extrabold text-xs rounded-xl">
+            Dolicz
+          </button>
+        </div>
+      </div>
+
+      <div id="summaryContentList" class="space-y-2.5 max-h-[40vh] overflow-y-auto">
         <!-- Injected final rankings -->
       </div>
 
@@ -354,9 +373,7 @@
       { name: 'Turkusowy', hex: '#0d9488' },
       { name: 'Bursztynowy', hex: '#f59e0b' },
       { name: 'Niebieski', hex: '#3b82f6' },
-      { name: 'Purpurowy', hex: '#a855f7' },
-      { name: 'Różowy', hex: '#ec4899' },
-      { name: 'Zielony', hex: '#10b981' }
+      { name: 'Purpurowy', hex: '#a855f7' }
     ];
 
     let gameState = {
@@ -421,8 +438,10 @@
     }
 
     function setPlayerCount(count) {
+      // Limit to 2..4 players
+      count = Math.min(Math.max(count, 2), 4);
       const current = gameState.players.length;
-      const angles = [0, 180, 90, 270, 45, 225];
+      const angles = [0, 180, 90, 270];
 
       if (count > current) {
         for (let i = current; i < count; i++) {
@@ -466,7 +485,7 @@
 
       document.querySelectorAll('.count-btn').forEach(btn => {
         const c = parseInt(btn.dataset.count);
-        btn.className = c === gameState.players.length ? 'count-btn px-2.5 py-1 rounded-lg text-xs font-black bg-teal-500 text-slate-950' : 'count-btn px-2.5 py-1 rounded-lg text-xs font-bold text-slate-300 hover:bg-slate-800';
+        btn.className = c === gameState.players.length ? 'count-btn px-3 py-1 rounded-lg text-xs font-black bg-teal-500 text-slate-950' : 'count-btn px-3 py-1 rounded-lg text-xs font-bold text-slate-300 hover:bg-slate-800';
       });
     }
 
@@ -562,18 +581,38 @@
     function addPenalty(val) {
       gameState.penaltyScore += val;
       playSound('warning');
+      updatePenaltyDisplay();
+    }
+
+    function applyMaxDrawPenalty() {
+      // 3 tiles drawn and unable to play: -5-5-5-10 = -25 pts total
+      gameState.penaltyScore = -25;
+      playSound('warning');
+      updatePenaltyDisplay();
+    }
+
+    function updatePenaltyDisplay() {
+      const disp = document.getElementById('penaltyBadgeDisplay');
+      if (gameState.penaltyScore < 0) {
+        disp.innerText = `Suma kar w tej turze: ${gameState.penaltyScore} pkt`;
+      } else {
+        disp.innerText = '';
+      }
     }
 
     function clearScoreForm() {
       document.getElementById('corner1').value = '';
       document.getElementById('corner2').value = '';
       document.getElementById('corner3').value = '';
+      document.getElementById('checkFinishBonus').checked = false;
       gameState.activeBonuses = {};
       gameState.penaltyScore = 0;
 
       document.querySelectorAll('.bonus-btn').forEach(b => {
         b.className = 'bonus-btn p-2 rounded-lg bg-slate-800 border border-slate-700 text-slate-300 hover:border-amber-400';
       });
+
+      updatePenaltyDisplay();
     }
 
     function submitTurnScore() {
@@ -583,13 +622,21 @@
 
       const cornerSum = c1 + c2 + c3;
       const bonusSum = Object.values(gameState.activeBonuses).reduce((a, b) => a + b, 0);
-      const totalTurnScore = cornerSum + bonusSum + gameState.penaltyScore;
+      const isFinishChecked = document.getElementById('checkFinishBonus').checked;
+      const finishBonus = isFinishChecked ? 25 : 0;
+
+      const totalTurnScore = cornerSum + bonusSum + gameState.penaltyScore + finishBonus;
 
       const activeP = gameState.players[gameState.activePlayerIndex];
       activeP.score += totalTurnScore;
       activeP.turnsPlayed++;
 
       playSound('score');
+
+      if (isFinishChecked) {
+        finishGameSession();
+        return;
+      }
 
       gameState.activePlayerIndex = (gameState.activePlayerIndex + 1) % gameState.players.length;
       if (gameState.activePlayerIndex === 0) gameState.roundNumber++;
@@ -624,14 +671,7 @@
       });
     }
 
-    function finishGameSession() {
-      clearInterval(gameState.timerInterval);
-      playSound('fanfare');
-
-      if (typeof confetti === 'function') {
-        confetti({ particleCount: 100, spread: 70, origin: { y: 0.6 } });
-      }
-
+    function renderSummaryList() {
       const list = document.getElementById('summaryContentList');
       list.innerHTML = '';
 
@@ -658,7 +698,30 @@
         `;
         list.appendChild(item);
       });
+    }
 
+    function addOpponentTilesToWinner() {
+      const val = parseInt(document.getElementById('opponentTilesSum').value) || 0;
+      if (val <= 0) return;
+
+      const sorted = [...gameState.players].sort((a, b) => b.score - a.score);
+      if (sorted.length > 0) {
+        sorted[0].score += val;
+        renderSummaryList();
+        document.getElementById('opponentTilesSum').value = '';
+        playSound('score');
+      }
+    }
+
+    function finishGameSession() {
+      clearInterval(gameState.timerInterval);
+      playSound('fanfare');
+
+      if (typeof confetti === 'function') {
+        confetti({ particleCount: 100, spread: 70, origin: { y: 0.6 } });
+      }
+
+      renderSummaryList();
       document.getElementById('summaryModal').classList.remove('hidden');
     }
 
