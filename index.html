@@ -467,7 +467,7 @@
 
   <!-- FOOTER -->
   <footer class="footer-bar w-full text-center py-3 text-xs border-t transition-colors duration-300">
-    Created by ToMi with AI • wersja 1.0.5
+    Created by ToMi with AI • wersja 1.0.6
   </footer>
 
   <script>
@@ -483,6 +483,8 @@
       3: [0, 90, 180],
       4: [0, 90, 180, 270]
     };
+
+    let cardCurrentRotation = 0; // Kumulatywny kąt obrotu tarczy
 
     let gameState = {
       turnDuration: 60,
@@ -720,6 +722,7 @@
       gameState.activePlayerIndex = 0;
       gameState.roundNumber = 1;
       gameState.totalTurnsCount = 1;
+      cardCurrentRotation = gameState.players[0].rotation;
 
       document.getElementById('setupView').classList.add('hidden');
       document.getElementById('gameView').classList.remove('hidden');
@@ -738,7 +741,15 @@
       card.style.boxShadow = `0 0 35px 2px ${active.colorHex}33`;
 
       document.getElementById('trianglePointer').style.borderBottomColor = active.colorHex;
-      document.getElementById('rotatingTimerBox').style.transform = `rotate(${active.rotation}deg)`;
+
+      // Zawsze obracaj zgodnie z ruchem wskazówek zegara
+      let targetRot = active.rotation;
+      let currentModulo = ((cardCurrentRotation % 360) + 360) % 360;
+      let diff = targetRot - currentModulo;
+      if (diff < 0) diff += 360;
+      
+      cardCurrentRotation += diff;
+      document.getElementById('rotatingTimerBox').style.transform = `rotate(${cardCurrentRotation}deg)`;
 
       clearScoreForm();
       updateLiveScoreboard();
