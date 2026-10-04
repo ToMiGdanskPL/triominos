@@ -251,7 +251,7 @@
             </svg>
             <div class="absolute flex flex-col items-center">
               <span id="timeDisplay" class="text-4xl font-black font-mono">60</span>
-              <span class="text-[10px] font-bold uppercase tracking-widest opacity-60">sekund</span>
+              <span id="timeUnitLabel" class="text-[10px] font-bold uppercase tracking-widest opacity-60">sekund</span>
             </div>
           </div>
         </div>
@@ -871,10 +871,19 @@
 
     function startTimer() {
       clearInterval(gameState.timerInterval);
+      
       if (gameState.turnDuration <= 0) {
-        document.getElementById('timerContainer').classList.add('hidden');
+        // Tryb bez limitu czasu
+        document.getElementById('timerContainer').classList.remove('hidden');
+        document.getElementById('timeDisplay').innerText = '∞';
+        document.getElementById('timeUnitLabel').innerText = 'tryb wolny';
+        const circle = document.getElementById('timerProgressCircle');
+        circle.style.strokeDashoffset = '0';
+        circle.style.stroke = '#64748b'; // szary kolor obramowania
         return;
       }
+
+      document.getElementById('timeUnitLabel').innerText = 'sekund';
       document.getElementById('timerContainer').classList.remove('hidden');
 
       gameState.remainingTime = gameState.turnDuration;
