@@ -187,7 +187,7 @@
       <div class="glass-panel rounded-2xl p-4 sm:p-6 space-y-4">
         <div class="flex items-center justify-between border-b border-slate-700/50 pb-3">
           <h3 class="text-sm font-bold uppercase tracking-wider text-teal-400 flex items-center gap-2">
-            <i class="fa-solid fa-list-ol"></i> Liczba graczy 🔢
+            <i class="fa-solid fa-list-ol"></i> Liczba graczy
           </h3>
           <div class="flex items-center bg-slate-900/80 p-1 rounded-xl border border-slate-700/80 gap-1">
             <button onclick="setPlayerCount(2)" class="count-btn px-4 py-1 rounded-lg text-sm font-bold" data-count="2">2</button>
@@ -373,7 +373,7 @@
 
         <section>
           <h4 class="font-bold text-teal-400 text-base mb-1">4. Przebieg tury</h4>
-          <p>W swojej turze gracz dokłada 1 kamień pasujący do układu na stole (dwa rogi musza się zgadzać). Zdobywa punkty równe sumie cyfr na dołożonym kamieniu + ew. bonusy.</p>
+          <p>W swojej turze gracz dokłada 1 kamień pasujący do układu na stole (dwa rogi muszą się zgadzać). Zdobywa punkty równe sumie cyfr na dołożonym kamieniu + ew. bonusy.</p>
           <p class="mt-1 font-semibold text-amber-300">Jeśli gracz nie ma pasującego kamienia:</p>
           <ul class="list-disc pl-5 space-y-1">
             <li>Dobiera kamień z zakrytego stosu (-5 pkt).</li>
@@ -462,7 +462,7 @@
 
   <!-- FOOTER -->
   <footer class="footer-bar w-full text-center py-3 text-xs border-t transition-colors duration-300">
-    Created by ToMi with AI • wersja 1.0.1
+    Created by ToMi with AI • wersja 1.0.3
   </footer>
 
   <script>
@@ -472,6 +472,12 @@
     ];
 
     const ROTATIONS = [0, 90, 180, 270];
+
+    const DEFAULT_ROTATIONS_MAP = {
+      2: [0, 180],
+      3: [0, 90, 180],
+      4: [0, 90, 180, 270]
+    };
 
     let gameState = {
       turnDuration: 60,
@@ -540,18 +546,25 @@
       renderSetupPlayerList();
     }
 
+    function applyDefaultRotations() {
+      const count = gameState.players.length;
+      const defs = DEFAULT_ROTATIONS_MAP[count] || [0, 90, 180, 270];
+      gameState.players.forEach((p, i) => {
+        p.rotation = defs[i % defs.length];
+      });
+    }
+
     function setPlayerCount(count) {
       count = Math.min(Math.max(count, 2), 4);
       const current = gameState.players.length;
-      const defaultRotations = [0, 180, 90, 270];
 
       if (count > current) {
         for (let i = current; i < count; i++) {
           gameState.players.push({
             id: Date.now() + i,
-            name: `Gracz ${i + 1}`,
+            name: '',
             colorHex: COLOR_PALETTE[i % COLOR_PALETTE.length],
-            rotation: defaultRotations[i % defaultRotations.length],
+            rotation: 0,
             score: 0,
             turnsPlayed: 0
           });
@@ -559,6 +572,8 @@
       } else if (count < current) {
         gameState.players = gameState.players.slice(0, count);
       }
+
+      applyDefaultRotations();
       renderSetupPlayerList();
     }
 
@@ -571,6 +586,7 @@
     function removePlayer(idx) {
       if (gameState.players.length > 2) {
         gameState.players.splice(idx, 1);
+        applyDefaultRotations();
         renderSetupPlayerList();
       }
     }
@@ -581,6 +597,8 @@
         const temp = gameState.players[idx];
         gameState.players[idx] = gameState.players[newIdx];
         gameState.players[newIdx] = temp;
+
+        applyDefaultRotations();
         renderSetupPlayerList();
       }
     }
