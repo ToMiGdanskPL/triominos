@@ -508,7 +508,7 @@
 
   <!-- FOOTER -->
   <footer class="footer-bar w-full text-center py-3 text-xs border-t transition-colors duration-300">
-    Created by ToMi with AI • wersja 1.1.0
+    Created by ToMi with AI • wersja 1.1.1
   </footer>
 
   <script>
@@ -879,7 +879,7 @@
         document.getElementById('timeUnitLabel').innerText = 'tryb wolny';
         const circle = document.getElementById('timerProgressCircle');
         circle.style.strokeDashoffset = '0';
-        circle.style.stroke = '#64748b'; // szary kolor obramowania
+        circle.style.stroke = gameState.players[gameState.activePlayerIndex].colorHex;
         return;
       }
 
