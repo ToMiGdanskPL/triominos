@@ -371,7 +371,7 @@
         <div id="modalTablePreviewMarkers" class="absolute inset-0 pointer-events-none"></div>
       </div>
 
-      <p class="text-center text-xs text-slate-400">Podgląd układu kątowego przy stole (0° u dołu)</p>
+      <p class="text-center text-xs text-slate-400">Podgląd układu kątowego przy stole (0° u dołu, co 15°)</p>
 
       <!-- Player angle sliders / selectors -->
       <div id="advancedPositionsList" class="space-y-3 max-h-[35vh] overflow-y-auto pr-1"></div>
@@ -508,7 +508,7 @@
 
   <!-- FOOTER -->
   <footer class="footer-bar w-full text-center py-3 text-xs border-t transition-colors duration-300">
-    Created by ToMi with AI • wersja 1.0.7
+    Created by ToMi with AI • wersja 1.0.8
   </footer>
 
   <script>
@@ -516,8 +516,6 @@
       '#ef4444', '#1e3a8a', '#c2410c', '#475569',
       '#10b981', '#8b5cf6', '#a16207', '#be185d'
     ];
-
-    const ROTATIONS = [0, 90, 180, 270];
 
     // 0 na dole, domyślne układy kątowe
     const DEFAULT_ROTATIONS_MAP = {
@@ -691,7 +689,7 @@
     function cycleRotation(idx, dir = 1) {
       const p = gameState.players[idx];
       let cur = p.rotation;
-      let step = 90;
+      let step = 15; // Zmieniono krok na 15 stopni
       let next = (cur + dir * step + 360) % 360;
       p.rotation = next;
       renderSetupPlayerList();
@@ -701,7 +699,8 @@
     }
 
     function setPlayerRotationDirect(idx, val) {
-      gameState.players[idx].rotation = parseInt(val) || 0;
+      let parsed = parseInt(val) || 0;
+      gameState.players[idx].rotation = ((parsed % 360) + 360) % 360;
       renderSetupPlayerList();
       if (!document.getElementById('advancedPositionsModal').classList.contains('hidden')) {
         renderAdvancedPositionsModalContent();
@@ -726,11 +725,11 @@
             <span class="font-bold text-sm text-white truncate max-w-[100px]">${p.name || ('Gracz ' + (idx + 1))}</span>
           </div>
           <div class="flex items-center bg-slate-950 rounded-xl border border-slate-800 px-1 py-0.5">
-            <button onclick="cycleRotation(${idx}, -1)" class="w-7 h-7 rounded-lg text-amber-400 hover:bg-slate-800 flex items-center justify-center text-xs transition">
+            <button onclick="cycleRotation(${idx}, -1)" class="w-7 h-7 rounded-lg text-amber-400 hover:bg-slate-800 flex items-center justify-center text-xs transition" title="-15°">
               <i class="fa-solid fa-chevron-left"></i>
             </button>
             <span class="w-12 text-center font-mono font-bold text-xs text-amber-400">${p.rotation}°</span>
-            <button onclick="cycleRotation(${idx}, 1)" class="w-7 h-7 rounded-lg text-amber-400 hover:bg-slate-800 flex items-center justify-center text-xs transition">
+            <button onclick="cycleRotation(${idx}, 1)" class="w-7 h-7 rounded-lg text-amber-400 hover:bg-slate-800 flex items-center justify-center text-xs transition" title="+15°">
               <i class="fa-solid fa-chevron-right"></i>
             </button>
           </div>
@@ -738,7 +737,6 @@
         listContainer.appendChild(row);
 
         // Render mini preview marker on circular table (Radius ~ 75px inside 192px container)
-        // 0° is at bottom (+90 deg math angle), 90° left, 180° top (-90 deg), 270° right
         let rad = ((p.rotation - 90) * Math.PI) / 180;
         let r = 70;
         let cx = 96 + r * Math.cos(rad);
@@ -765,7 +763,6 @@
 
         card.innerHTML = `
           <div class="flex items-center gap-2">
-            <!-- Kliknięcie na stopnie gracza uruchamia zaawansowane ustawienia pozycji -->
             <div onclick="toggleAdvancedPositionsModal()" class="flex items-center gap-1.5 bg-slate-800/80 px-2.5 py-1 rounded-lg border border-slate-700/60 cursor-pointer hover:border-amber-400/60 transition group" title="Kliknij, aby otworzyć zaawansowane pozycje">
               <span class="font-black text-sm text-slate-200 group-hover:text-amber-400">${idx + 1}</span>
               <div class="flex flex-col text-[10px] leading-tight text-slate-400">
@@ -792,7 +789,7 @@
               `).join('')}
             </div>
 
-            <button type="button" onclick="toggleAdvancedPositionsModal()" class="px-2.5 py-1 rounded-xl bg-slate-800/90 border border-slate-700/80 text-amber-400 hover:text-amber-300 font-bold text-xs flex items-center gap-1.5 shrink-0" title="Zaawansowane pozycje">
+            <button type="button" onclick="toggleAdvancedPositionsModal()" class="px-2.5 py-1 rounded-xl bg-slate-800/90 border border-slate-700/80 text-amber-400 hover:text-amber-300 font-bold text-xs flex items-center gap-1.5 shrink-0" title="Zaawansowane pozycje (co 15°)">
               <i class="fa-solid fa-compass"></i>
               <span>${p.rotation}°</span>
             </button>
@@ -850,7 +847,6 @@
       card.style.borderColor = active.colorHex;
       card.style.boxShadow = `0 0 35px 2px ${active.colorHex}33`;
 
-      // Obrót tarczy zgodnie z ruchem wskazówek zegara do żądanego kąta gracza
       let targetRot = active.rotation;
       let currentModulo = ((cardCurrentRotation % 360) + 360) % 360;
       let diff = targetRot - currentModulo;
