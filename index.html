@@ -113,6 +113,16 @@
     .timer-card-rotate {
       transition: transform 0.6s cubic-bezier(0.34, 1.56, 0.64, 1);
     }
+
+    /* Hide number input spinners */
+    input[type=number]::-webkit-inner-spin-button, 
+    input[type=number]::-webkit-outer-spin-button { 
+      -webkit-appearance: none; 
+      margin: 0; 
+    }
+    input[type=number] {
+      -moz-appearance: textfield;
+    }
   </style>
 </head>
 <body class="dark-theme h-full flex flex-col justify-between overflow-x-hidden select-none">
@@ -165,19 +175,19 @@
         <div class="grid grid-cols-2 sm:grid-cols-4 gap-2 sm:gap-3">
           <button onclick="selectPresetTime(30)" id="timeBtn30" class="time-opt-btn p-3 rounded-xl border text-center font-semibold text-sm flex flex-col items-center gap-1 border-slate-700 bg-slate-800/60 hover:bg-slate-700">
             <span class="text-lg">30s</span>
-            <span class="text-[10px] text-slate-400">Szybka gra</span>
+            <span class="text-[10px] opacity-70">Szybka gra</span>
           </button>
           <button onclick="selectPresetTime(60)" id="timeBtn60" class="time-opt-btn p-3 rounded-xl border text-center font-semibold text-sm flex flex-col items-center gap-1 border-teal-500 bg-teal-500/20 text-teal-400">
             <span class="text-lg">60s</span>
-            <span class="text-[10px] text-slate-400">Standard</span>
+            <span class="text-[10px] opacity-70">Standard</span>
           </button>
           <button onclick="selectPresetTime(90)" id="timeBtn90" class="time-opt-btn p-3 rounded-xl border text-center font-semibold text-sm flex flex-col items-center gap-1 border-slate-700 bg-slate-800/60 hover:bg-slate-700">
             <span class="text-lg">90s</span>
-            <span class="text-[10px] text-slate-400">Taktyczna</span>
+            <span class="text-[10px] opacity-70">Taktyczna</span>
           </button>
           <button onclick="selectPresetTime(0)" id="timeBtn0" class="time-opt-btn p-3 rounded-xl border text-center font-semibold text-sm flex flex-col items-center gap-1 border-slate-700 bg-slate-800/60 hover:bg-slate-700">
             <span class="text-lg">Bez limitu</span>
-            <span class="text-[10px] text-slate-400">Tylko punkty</span>
+            <span class="text-[10px] opacity-70">Tylko punkty</span>
           </button>
         </div>
       </div>
@@ -218,10 +228,10 @@
       <div id="activePlayerCard" class="glass-panel rounded-3xl p-5 sm:p-6 text-center relative overflow-hidden player-card-glow border-2 transition-all duration-300">
         
         <div class="flex items-center justify-between mb-2">
-          <span id="turnCounterBadge" class="px-3 py-1 rounded-full text-xs font-semibold bg-slate-800 text-slate-300 border border-slate-700">
+          <span id="turnCounterBadge" class="px-3 py-1 rounded-full text-xs font-semibold bg-slate-800/80 text-slate-300 border border-slate-700">
             Runda 1 • Tura 1
           </span>
-          <button onclick="finishGameSession()" class="px-3 py-1 rounded-full bg-red-950/40 hover:bg-red-900/60 text-red-300 text-xs font-bold border border-red-800/50">
+          <button onclick="finishGameSession()" class="px-3 py-1 rounded-full bg-red-950/40 hover:bg-red-900/60 text-red-300 text-xs font-bold border border-red-800/50 transition">
             Zakończ grę
           </button>
         </div>
@@ -233,17 +243,17 @@
           <h2 id="activePlayerName" class="text-3xl sm:text-4xl font-black tracking-tight drop-shadow-md">
             Gracz 1
           </h2>
-          <p class="text-xs text-slate-400 mt-0.5">Ułóż Triomino i wprowadź punkty poniżej</p>
+          <p class="text-xs opacity-75 mt-0.5">Ułóż Triomino i wprowadź punkty poniżej</p>
 
           <!-- Timer Visual -->
           <div id="timerContainer" class="relative w-36 h-36 my-3 flex items-center justify-center">
             <svg class="w-full h-full transform -rotate-90" viewBox="0 0 100 100">
-              <circle cx="50" cy="50" r="40" stroke="currentColor" stroke-width="6" class="text-slate-800" fill="transparent" />
+              <circle cx="50" cy="50" r="40" stroke="currentColor" stroke-width="6" class="text-slate-800/50" fill="transparent" />
               <circle id="timerProgressCircle" cx="50" cy="50" r="40" stroke="currentColor" stroke-width="6" stroke-linecap="round" class="timer-ring-triangle text-teal-400" fill="transparent" stroke-dasharray="251.2" stroke-dashoffset="0" />
             </svg>
             <div class="absolute flex flex-col items-center">
               <span id="timeDisplay" class="text-4xl font-black font-mono">60</span>
-              <span class="text-[10px] font-bold uppercase tracking-widest text-slate-400">sekund</span>
+              <span class="text-[10px] font-bold uppercase tracking-widest opacity-60">sekund</span>
             </div>
           </div>
         </div>
@@ -253,9 +263,14 @@
           
           <!-- Tile Numbers Input (3 corners) -->
           <div>
-            <label class="block text-xs font-bold uppercase tracking-wider text-slate-300 mb-1.5">
-              1. Wartości z rogów kamienia (Triomino)
-            </label>
+            <div class="flex items-center justify-between mb-1.5">
+              <label class="block text-xs font-bold uppercase tracking-wider text-teal-400">
+                1. Wartości z rogów kamienia (0–5)
+              </label>
+              <button type="button" onclick="clearCorners()" class="text-[10px] font-bold text-slate-400 hover:text-amber-400 transition">
+                <i class="fa-solid fa-eraser mr-1"></i>Wyczyszczenie
+              </button>
+            </div>
             <div class="grid grid-cols-3 gap-2">
               <input type="number" id="corner1" min="0" max="5" oninput="validateCornerInput(this)" placeholder="Róg 1" class="input-box text-center py-2 text-lg font-black rounded-xl border focus:border-teal-400 focus:outline-none">
               <input type="number" id="corner2" min="0" max="5" oninput="validateCornerInput(this)" placeholder="Róg 2" class="input-box text-center py-2 text-lg font-black rounded-xl border focus:border-teal-400 focus:outline-none">
@@ -265,21 +280,21 @@
 
           <!-- Bonus Combinations Buttons -->
           <div>
-            <label class="block text-xs font-bold uppercase tracking-wider text-amber-400 mb-1.5">
+            <label class="block text-xs font-bold uppercase tracking-wider text-amber-400 mb-1.5 text-left">
               2. Premie specjalne i Kary
             </label>
             <div class="grid grid-cols-2 sm:grid-cols-4 gap-1.5 text-xs font-bold">
-              <button type="button" onclick="toggleBonus('bridge', 40)" id="bonusBridge" class="bonus-btn p-2 rounded-lg bg-slate-800 border border-slate-700 text-slate-300 hover:border-amber-400">
+              <button type="button" onclick="toggleBonus('bridge', 40)" id="bonusBridge" class="bonus-btn p-2 rounded-lg bg-slate-800/80 border border-slate-700 text-slate-300 hover:border-amber-400 transition">
                 Most (+40)
               </button>
-              <button type="button" onclick="toggleBonus('hexagon', 50)" id="bonusHexagon" class="bonus-btn p-2 rounded-lg bg-slate-800 border border-slate-700 text-slate-300 hover:border-amber-400">
+              <button type="button" onclick="toggleBonus('hexagon', 50)" id="bonusHexagon" class="bonus-btn p-2 rounded-lg bg-slate-800/80 border border-slate-700 text-slate-300 hover:border-amber-400 transition">
                 Heksagon (+50)
               </button>
-              <button type="button" onclick="toggleBonus('doubleHex', 60)" id="bonusDoubleHex" class="bonus-btn p-2 rounded-lg bg-slate-800 border border-slate-700 text-slate-300 hover:border-amber-400">
-                Podwójny Heksagon (+60)
+              <button type="button" onclick="toggleBonus('doubleHex', 60)" id="bonusDoubleHex" class="bonus-btn p-2 rounded-lg bg-slate-800/80 border border-slate-700 text-slate-300 hover:border-amber-400 transition">
+                Podwójny (+60)
               </button>
-              <button type="button" onclick="toggleBonus('tripleHex', 70)" id="bonusTripleHex" class="bonus-btn p-2 rounded-lg bg-slate-800 border border-slate-700 text-slate-300 hover:border-amber-400">
-                Potrójny Heksagon (+70)
+              <button type="button" onclick="toggleBonus('tripleHex', 70)" id="bonusTripleHex" class="bonus-btn p-2 rounded-lg bg-slate-800/80 border border-slate-700 text-slate-300 hover:border-amber-400 transition">
+                Potrójny (+70)
               </button>
             </div>
 
@@ -290,7 +305,7 @@
                 <span id="seqPenaltyLabel">Dobranie kamienia -5pkt</span>
               </button>
 
-              <button type="button" id="resetPenaltyBtn" onclick="resetPenaltyStep()" title="Resetuj kary" class="p-2.5 rounded-xl bg-slate-800 border border-slate-700 text-slate-400 hover:text-slate-200 text-xs font-bold hidden">
+              <button type="button" id="resetPenaltyBtn" onclick="resetPenaltyStep()" title="Resetuj kary" class="p-2.5 rounded-xl bg-slate-800/80 border border-slate-700 text-slate-400 hover:text-slate-200 text-xs font-bold hidden transition">
                 <i class="fa-solid fa-rotate-left"></i>
               </button>
             </div>
@@ -300,14 +315,14 @@
 
           <!-- End Game Bonus Checkbox -->
           <div class="bg-amber-500/10 border border-amber-500/30 p-2.5 rounded-xl text-left">
-            <label class="flex items-center gap-2 text-xs font-bold text-amber-300 cursor-pointer">
+            <label class="flex items-center gap-2 text-xs font-bold text-amber-400 cursor-pointer">
               <input type="checkbox" id="checkFinishBonus" class="w-4 h-4 rounded accent-amber-500">
-              <span>Ostatnie Triomino (Bonus +25 pkt)</span>
+              <span>Ostatnie Triomino (Bonus +25 pkt za wyłożenie)</span>
             </label>
           </div>
 
           <!-- Submit Score & Turn Button -->
-          <button onclick="submitTurnScore()" class="w-full py-3.5 rounded-xl bg-gradient-to-r from-teal-500 to-emerald-500 hover:from-teal-400 hover:to-emerald-400 text-slate-950 font-black text-lg shadow-lg flex items-center justify-center gap-2">
+          <button onclick="submitTurnScore()" class="w-full py-3.5 rounded-xl bg-gradient-to-r from-teal-500 to-emerald-500 hover:from-teal-400 hover:to-emerald-400 text-slate-950 font-black text-lg shadow-lg flex items-center justify-center gap-2 transition transform active:scale-98">
             <span>ZATWIERDŹ PUNKTY I NASTĘPNY</span>
             <i class="fa-solid fa-chevron-right"></i>
           </button>
@@ -425,13 +440,13 @@
         <p class="text-xs text-slate-400">Podsumowanie i klasyfikacja końcowa</p>
       </div>
 
-      <div class="bg-slate-800/60 p-3 rounded-2xl border border-slate-700 space-y-2 text-left">
+      <div id="opponentTilesBox" class="bg-slate-800/60 p-3 rounded-2xl border border-slate-700 space-y-2 text-left">
         <label class="block text-xs font-bold text-amber-400">
           Suma kamieni na podstawkach przeciwników (dla zwycięzcy):
         </label>
         <div class="flex gap-2">
           <input type="number" id="opponentTilesSum" placeholder="np. 45" class="input-box flex-1 px-3 py-1.5 text-sm font-bold rounded-xl border focus:outline-none">
-          <button onclick="addOpponentTilesToWinner()" class="px-4 py-1.5 bg-amber-500 hover:bg-amber-400 text-slate-950 font-extrabold text-xs rounded-xl">
+          <button id="addBonusBtn" onclick="addOpponentTilesToWinner()" class="px-4 py-1.5 bg-amber-500 hover:bg-amber-400 text-slate-950 font-extrabold text-xs rounded-xl transition">
             Dolicz
           </button>
         </div>
@@ -440,10 +455,10 @@
       <div id="summaryContentList" class="space-y-2.5 max-h-[40vh] overflow-y-auto"></div>
 
       <div class="pt-3 border-t border-slate-700 flex gap-3">
-        <button onclick="closeSummaryModal()" class="w-full py-3 rounded-xl bg-slate-800 hover:bg-slate-700 text-slate-200 font-bold text-sm">
+        <button onclick="closeSummaryModal()" class="w-full py-3 rounded-xl bg-slate-800 hover:bg-slate-700 text-slate-200 font-bold text-sm transition">
           Menu główne
         </button>
-        <button onclick="restartGame()" class="w-full py-3 rounded-xl bg-teal-500 hover:bg-teal-400 text-slate-950 font-extrabold text-sm">
+        <button onclick="restartGame()" class="w-full py-3 rounded-xl bg-teal-500 hover:bg-teal-400 text-slate-950 font-extrabold text-sm transition">
           Zagraj ponownie
         </button>
       </div>
@@ -452,7 +467,7 @@
 
   <!-- FOOTER -->
   <footer class="footer-bar w-full text-center py-3 text-xs border-t transition-colors duration-300">
-    Created by ToMi with AI • wersja 1.0.4
+    Created by ToMi with AI • wersja 1.0.5
   </footer>
 
   <script>
@@ -498,6 +513,15 @@
     document.addEventListener('click', initAudio, { once: true });
     document.addEventListener('touchstart', initAudio, { once: true });
 
+    document.addEventListener('keydown', function(e) {
+      if (e.key === 'Enter' && !document.getElementById('gameView').classList.contains('hidden')) {
+        const activeModal = document.querySelector('#rulesModal:not(.hidden), #summaryModal:not(.hidden)');
+        if (!activeModal) {
+          submitTurnScore();
+        }
+      }
+    });
+
     function playSound(type) {
       if (!gameState.soundEnabled) return;
       try {
@@ -542,13 +566,17 @@
     }
 
     function validateCornerInput(input) {
-      let val = parseInt(input.value);
-      if (isNaN(val)) {
-        input.value = '';
-        return;
+      let val = input.value.replace(/[^0-5]/g, '');
+      if (val.length > 1) {
+        val = val.slice(-1);
       }
-      if (val < 0) input.value = 0;
-      if (val > 5) input.value = 5;
+      input.value = val;
+    }
+
+    function clearCorners() {
+      document.getElementById('corner1').value = '';
+      document.getElementById('corner2').value = '';
+      document.getElementById('corner3').value = '';
     }
 
     function applyDefaultRotations() {
@@ -755,10 +783,10 @@
       if (gameState.activeBonuses[key]) {
         delete gameState.activeBonuses[key];
         btn.classList.remove('bg-amber-500', 'text-slate-950', 'border-amber-400');
-        btn.classList.add('bg-slate-800', 'text-slate-300');
+        btn.classList.add('bg-slate-800/80', 'text-slate-300');
       } else {
         gameState.activeBonuses[key] = val;
-        btn.classList.remove('bg-slate-800', 'text-slate-300');
+        btn.classList.remove('bg-slate-800/80', 'text-slate-300');
         btn.classList.add('bg-amber-500', 'text-slate-950', 'border-amber-400');
       }
     }
@@ -821,14 +849,12 @@
     }
 
     function clearScoreForm() {
-      document.getElementById('corner1').value = '';
-      document.getElementById('corner2').value = '';
-      document.getElementById('corner3').value = '';
+      clearCorners();
       document.getElementById('checkFinishBonus').checked = false;
       gameState.activeBonuses = {};
 
       document.querySelectorAll('.bonus-btn').forEach(b => {
-        b.className = 'bonus-btn p-2 rounded-lg bg-slate-800 border border-slate-700 text-slate-300 hover:border-amber-400';
+        b.className = 'bonus-btn p-2 rounded-lg bg-slate-800/80 border border-slate-700 text-slate-300 hover:border-amber-400 transition';
       });
 
       resetPenaltyStep();
@@ -880,12 +906,12 @@
 
         item.innerHTML = `
           <div class="flex items-center gap-3">
-            <span class="font-black text-sm text-slate-400">#${rank + 1}</span>
-            <span class="font-bold text-sm text-white">${p.name}</span>
+            <span class="font-black text-sm opacity-60">#${rank + 1}</span>
+            <span class="font-bold text-sm">${p.name}</span>
           </div>
           <div class="text-right">
             <span class="text-lg font-black text-amber-400">${p.score}</span>
-            <span class="text-[10px] text-slate-400 block">pkt</span>
+            <span class="text-[10px] opacity-60 block">pkt</span>
           </div>
         `;
         container.appendChild(item);
@@ -922,14 +948,18 @@
     }
 
     function addOpponentTilesToWinner() {
-      const val = parseInt(document.getElementById('opponentTilesSum').value) || 0;
+      const input = document.getElementById('opponentTilesSum');
+      const val = parseInt(input.value) || 0;
       if (val <= 0) return;
 
       const sorted = [...gameState.players].sort((a, b) => b.score - a.score);
       if (sorted.length > 0) {
         sorted[0].score += val;
         renderSummaryList();
-        document.getElementById('opponentTilesSum').value = '';
+        input.value = '';
+        input.disabled = true;
+        document.getElementById('addBonusBtn').disabled = true;
+        document.getElementById('addBonusBtn').classList.add('opacity-50');
         playSound('score');
       }
     }
@@ -937,6 +967,10 @@
     function finishGameSession() {
       clearInterval(gameState.timerInterval);
       playSound('fanfare');
+
+      document.getElementById('opponentTilesSum').disabled = false;
+      document.getElementById('addBonusBtn').disabled = false;
+      document.getElementById('addBonusBtn').classList.remove('opacity-50');
 
       if (typeof confetti === 'function') {
         confetti({ particleCount: 100, spread: 70, origin: { y: 0.6 } });
