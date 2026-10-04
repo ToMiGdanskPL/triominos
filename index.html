@@ -236,10 +236,8 @@
           </button>
         </div>
 
-        <!-- Rotating Arrow Pointer -->
+        <!-- Rotating Card Content -->
         <div id="rotatingTimerBox" class="timer-card-rotate py-1 flex flex-col items-center justify-center my-1">
-          <div id="trianglePointer" class="w-0 h-0 border-l-[14px] border-l-transparent border-r-[14px] border-r-transparent border-b-[24px] border-b-teal-400 mb-2 drop-shadow-lg transition-colors"></div>
-
           <h2 id="activePlayerName" class="text-3xl sm:text-4xl font-black tracking-tight drop-shadow-md">
             Gracz 1
           </h2>
@@ -739,8 +737,6 @@
       const card = document.getElementById('activePlayerCard');
       card.style.borderColor = active.colorHex;
       card.style.boxShadow = `0 0 35px 2px ${active.colorHex}33`;
-
-      document.getElementById('trianglePointer').style.borderBottomColor = active.colorHex;
 
       // Zawsze obracaj zgodnie z ruchem wskazówek zegara
       let targetRot = active.rotation;
