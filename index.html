@@ -3,7 +3,7 @@
 <head>
   <meta charset="UTF-8">
   <meta name="viewport" content="width=device-width, initial-scale=1.0">
-  <title>Triominos Timer</title>
+  <title>Triominos Score & Timer</title>
   
   <!-- App Favicon -->
   <link rel="icon" type="image/svg+xml" href="data:image/svg+xml,<svg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 100 100'><polygon points='50,15 90,85 10,85' fill='%230d9488'/><text x='50' y='72' font-family='sans-serif' font-weight='900' font-size='38' fill='%23fbbf24' text-anchor='middle'>3</text></svg>">
@@ -135,7 +135,7 @@
           <i class="fa-solid fa-play transform -rotate-90 text-slate-950 text-sm"></i>
         </div>
         <div>
-          <h1 class="header-title font-black text-lg leading-tight tracking-wide text-white">Triominos Timer</h1>
+          <h1 class="header-title font-black text-lg leading-tight tracking-wide text-white">Triominos Masters</h1>
         </div>
       </div>
 
@@ -254,6 +254,11 @@
               <span id="timeUnitLabel" class="text-[10px] font-bold uppercase tracking-widest opacity-60">sekund</span>
             </div>
           </div>
+
+          <!-- Next Player Info Below Timer -->
+          <div id="nextPlayerInfo" class="text-xs font-semibold tracking-wide text-slate-400 mt-1">
+            Kolejny gracz: <span id="nextPlayerName" class="text-teal-400 font-bold">-</span>
+          </div>
         </div>
 
         <!-- SCORE CALCULATOR FORM -->
@@ -263,7 +268,7 @@
           <div>
             <div class="flex items-center justify-between mb-1.5">
               <label class="block text-xs font-bold uppercase tracking-wider text-teal-400">
-                Wartości z rogów kamienia (0–5)
+                1. Wartości z rogów kamienia (0–5)
               </label>
               <button type="button" onclick="clearCorners()" class="text-[10px] font-bold text-slate-400 hover:text-amber-400 transition">
                 <i class="fa-solid fa-eraser mr-1"></i>Wyczyszczenie
@@ -279,7 +284,7 @@
           <!-- Bonus Combinations Buttons -->
           <div>
             <label class="block text-xs font-bold uppercase tracking-wider text-amber-400 mb-1.5 text-left">
-              Premie specjalne i Kary
+              2. Premie specjalne i Kary
             </label>
             <div class="grid grid-cols-2 sm:grid-cols-4 gap-1.5 text-xs font-bold">
               <button type="button" onclick="toggleBonus('bridge', 40)" id="bonusBridge" class="bonus-btn p-2 rounded-lg bg-slate-800/80 border border-slate-700 text-slate-300 hover:border-amber-400 transition">
@@ -850,7 +855,11 @@
 
     function renderActiveTurnUI() {
       const active = gameState.players[gameState.activePlayerIndex];
+      const nextIndex = (gameState.activePlayerIndex + 1) % gameState.players.length;
+      const nextPlayer = gameState.players[nextIndex];
+
       document.getElementById('activePlayerName').innerText = active.name;
+      document.getElementById('nextPlayerName').innerText = nextPlayer.name;
       document.getElementById('turnCounterBadge').innerText = `Runda ${gameState.roundNumber} • Tura #${gameState.totalTurnsCount}`;
 
       const card = document.getElementById('activePlayerCard');
